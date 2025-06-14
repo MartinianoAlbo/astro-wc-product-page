@@ -1,5 +1,5 @@
 // Cliente API para comunicarse con WordPress
-import https from 'https';
+// import https from 'https';
 
 export interface Product {
   id: number;
@@ -74,7 +74,7 @@ export interface Cart {
 const WP_API_URL        = import.meta.env.WP_API_URL as string;          // p.ej. 'http://saphirus.local/wp-json'
 const WC_CONSUMER_KEY   = import.meta.env.WC_CONSUMER_KEY as string;    // tu CK
 const WC_CONSUMER_SECRET= import.meta.env.WC_CONSUMER_SECRET as string; // tu CS
-const devAgent = new https.Agent({ rejectUnauthorized: false });
+// Removed static https agent; using dynamic import in fetch
 
 class WordPressAPI {
   private baseUrl: string;
@@ -91,6 +91,14 @@ class WordPressAPI {
   }
 
   private async fetch(endpoint: string, options: RequestInit = {}) {
+    // Sólo en SSR desarrollo, importar dinámicamente https.Agent
+    let agent: import('https').Agent | undefined;
+    if (import.meta.env.SSR && process.env.NODE_ENV === 'development') {
+      const { Agent } = await import('https');
+      agent = new Agent({ rejectUnauthorized: false });
+      console.log('dev');
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    }
     const url = `${this.baseUrl}${endpoint}`;
     
     const headers = new Headers(options.headers || {});
@@ -100,16 +108,12 @@ class WordPressAPI {
       headers.set('X-WP-Nonce', this.nonce);
     }
 
-    const fetchOptions: RequestInit & { agent?: https.Agent } = {
+    const fetchOptions: RequestInit & { agent?: import('https').Agent } = {
       ...options,
       headers,
       credentials: 'include',
+      ...(agent ? { agent } : {}),
     };
-
-    if (import.meta.env.SSR && process.env.NODE_ENV === 'development') {
-      console.log('dev');
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    }
 
     const response = await fetch(url, fetchOptions);
 

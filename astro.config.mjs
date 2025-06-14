@@ -2,11 +2,11 @@ import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import fs from 'fs';
-import { dirname, resolve } from 'path';
+import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-
+import { resolve } from 'node:path';
 import dotenv from 'dotenv';
-import vercel from '@astrojs/vercel';
+import vercel from '@astrojs/vercel/serverless';
 dotenv.config();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -25,6 +25,7 @@ export default defineConfig({
 
   // Generar archivos estáticos para que WP los lea con file_exists
   output: 'server',
+  adapter: vercel(),
 
   // Configuración de build
   build: {
@@ -48,6 +49,11 @@ export default defineConfig({
   // Configuración de Vite
   vite: {
     build: {
+      resolve: {
+        alias: {
+          '@': __dirname + '/src',
+        },
+      },
       // Genera un manifest.json con mapping de assets
       manifest: true,
       rollupOptions: {
@@ -57,11 +63,6 @@ export default defineConfig({
           chunkFileNames: 'js/[name].[hash].js',
           assetFileNames: 'assets/[name].[hash][extname]',
         },
-      },
-    },
-    resolve: {
-      alias: {
-        '@': __dirname +'/src',
       },
     },
     server: {
@@ -95,5 +96,4 @@ export default defineConfig({
     }
   },
 
-  adapter: vercel(),
 });
