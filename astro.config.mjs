@@ -6,6 +6,7 @@ import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 import dotenv from 'dotenv';
+import vercel from '@astrojs/vercel';
 dotenv.config();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -85,6 +86,7 @@ export default defineConfig({
       },
     },
   },
+
   env: {
     schema: {
       WP_API_URL: { context: 'client',  access: 'public', type: 'string' },
@@ -92,4 +94,6 @@ export default defineConfig({
       WC_CONSUMER_SECRET: { context: 'server', access: 'secret', type: 'string' },
     }
   },
+
+  adapter: vercel(),
 });
