@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { api, type Product, type ProductVariation } from '@/lib/api';
+import { api, type Product, type ProductVariation } from '../lib/api';
 
 interface AddToCartProps {
   product: Product;

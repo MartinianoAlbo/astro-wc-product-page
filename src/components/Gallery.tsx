@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ProductImage } from '@/lib/api';
+import type { ProductImage } from '../lib/api';
 
 export default function Gallery({ mainImage, images, productName }: { mainImage: ProductImage, images: ProductImage[], productName: string }) {
   const [active, setActive] = useState(mainImage.id);
