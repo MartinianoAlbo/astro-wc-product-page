@@ -24,7 +24,7 @@ export default defineConfig({
     : '/wp-content/plugins/react-product-page/astro-product-page-app/dist',
 
   // Generar archivos estáticos para que WP los lea con file_exists
-  output: 'static',
+  output: 'server',
 
   // Configuración de build
   build: {
