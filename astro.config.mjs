@@ -59,8 +59,9 @@ export default defineConfig({
       },
     },
     resolve: {
-    alias: {
-      '@': __dirname +'./src',
+      alias: {
+        '@': __dirname +'./src',
+      },
     },
     server: {
       port: 3000,
