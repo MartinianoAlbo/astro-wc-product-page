@@ -74,6 +74,7 @@ export default defineConfig({
   // Vite configuration
   vite: {
     build: {
+      manifest: true,
       rollupOptions: {
         output: {
           // Nombres de archivos más limpios
@@ -83,7 +84,15 @@ export default defineConfig({
         }
       }
     },
-    
+    resolve: {
+      alias: {
+        // '@' apuntará al folder 'src'
+        '@': resolve('./src'),
+        // si quieres alias más concretos:
+        // '@/components': resolve('./src/components'),
+        // '@/lib':        resolve('./src/lib'),
+      },
+    },
     // Para desarrollo con WordPress
     server: {
       cors: true,
