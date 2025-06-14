@@ -61,7 +61,7 @@ export default defineConfig({
     },
     resolve: {
       alias: {
-        '@': __dirname +'./src',
+        '@': __dirname +'/src',
       },
     },
     server: {
