@@ -11,7 +11,7 @@ const { product } = Astro.props;
 const formatPrice = (price: string) => {
   return new Intl.NumberFormat('es-ES', {
     style: 'currency',
-    currency: 'ARS' // Cambiar a argentina
+    currency: 'EUR' // Cambiar según tu moneda
   }).format(parseFloat(price));
 };
 

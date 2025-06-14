@@ -3,10 +3,9 @@ import { api, type Product, type ProductVariation } from '@/lib/api';
 
 interface AddToCartProps {
   product: Product;
-  nonce: string;
 }
 
-export default function AddToCart({ product, nonce }: AddToCartProps) {
+export default function AddToCart({ product }: AddToCartProps) {
   const [quantity, setQuantity] = useState(1);
   const [selectedVariation, setSelectedVariation] = useState<ProductVariation | null>(null);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
@@ -14,20 +13,17 @@ export default function AddToCart({ product, nonce }: AddToCartProps) {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [cartCount, setCartCount] = useState(0);
 
-  // Configurar nonce al montar
+  // Configurar nonce al montar 
   useEffect(() => {
-    if (nonce) {
-      api.setNonce(nonce);
-    }
-    // Obtener contador del carrito inicial
+    api.setNonce((window as any).rppData.nonce);
     fetchCartCount();
-  }, [nonce]);
+  }, []);
 
   // Para productos variables, establecer variación por defecto
   useEffect(() => {
     if (product.type === 'variable' && product.variations.length > 0) {
       // Encontrar primera variación en stock
-      const defaultVariation = product.variations.find(v => v.purchasable) || product.variations[0];
+      const defaultVariation = product.variations.find(v => v.stock_status === 'instock') || product.variations[0];
       setSelectedVariation(defaultVariation);
       setSelectedAttributes(defaultVariation.attributes);
     }
@@ -67,9 +63,11 @@ export default function AddToCart({ product, nonce }: AddToCartProps) {
 
   const handleAddToCart = async () => {
     setIsLoading(true);
+      console.log(product)
     setMessage(null);
 
     try {
+      console.log(product)
       const variationId = selectedVariation?.id || 0;
       const result = await api.addToCart(
         product.id,
@@ -124,7 +122,7 @@ export default function AddToCart({ product, nonce }: AddToCartProps) {
                 onChange={(e) => handleAttributeChange(attribute.name, e.target.value)}
               >
                 <option value="">Seleccionar {attribute.name}</option>
-                {attribute.options.map((option) => (
+                {attribute.options.map((option: string) => (
                   <option key={option} value={option}>
                     {option}
                   </option>
@@ -175,7 +173,7 @@ export default function AddToCart({ product, nonce }: AddToCartProps) {
         <button
           type="button"
           onClick={handleAddToCart}
-          disabled={!canAddToCart}
+          // disabled={!canAddToCart}
           className={`
             rpp-flex-1 rpp-px-6 rpp-py-3 rpp-rounded-md rpp-font-medium rpp-transition-all
             ${canAddToCart
@@ -203,16 +201,6 @@ export default function AddToCart({ product, nonce }: AddToCartProps) {
         </button>
       </div>
 
-      {/* Precio total */}
-      <div className="rpp-text-center rpp-mb-4">
-        <span className="rpp-text-sm rpp-text-gray-600">Total: </span>
-        <span className="rpp-text-lg rpp-font-bold rpp-text-gray-900">
-          {new Intl.NumberFormat('es-ES', {
-            style: 'currency',
-            currency: 'EUR'
-          }).format(parseFloat(currentPrice) * quantity)}
-        </span>
-      </div>
 
       {/* Mensajes */}
       {message && (
@@ -255,29 +243,7 @@ export default function AddToCart({ product, nonce }: AddToCartProps) {
         </div>
       )}
 
-      {/* Información adicional */}
-      <div className="rpp-border-t rpp-pt-4 rpp-mt-6">
-        <ul className="rpp-space-y-2 rpp-text-sm rpp-text-gray-600">
-          <li className="rpp-flex rpp-items-center">
-            <svg className="rpp-w-4 rpp-h-4 rpp-mr-2 rpp-text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            Envío gratis en pedidos superiores a 50€
-          </li>
-          <li className="rpp-flex rpp-items-center">
-            <svg className="rpp-w-4 rpp-h-4 rpp-mr-2 rpp-text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Garantía de satisfacción de 30 días
-          </li>
-          <li className="rpp-flex rpp-items-center">
-            <svg className="rpp-w-4 rpp-h-4 rpp-mr-2 rpp-text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            Pago seguro con cifrado SSL
-          </li>
-        </ul>
-      </div>
+      
     </div>
   );
 }
